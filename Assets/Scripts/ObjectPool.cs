@@ -6,42 +6,43 @@ public class ObjectPool : MonoBehaviour
     [SerializeField] private CubeInteraction _cubePrefab;
     [SerializeField] private int _initialPoolSize = 20;
 
-    private Queue<CubeInteraction> _pooledObjects = new Queue<CubeInteraction>();
+    private Queue<CubeInteraction> _cubes = new Queue<CubeInteraction>();
 
     private void Start()
     {
-        InitializePool();
+        Initialize();
     }
 
-    private void InitializePool()
+    private void Initialize()
     {
         for (int i = 0; i < _initialPoolSize; i++)
         {
-            CreateNewPooledObject();
+            CreateCube();
         }
     }
 
-    private CubeInteraction CreateNewPooledObject()
+    private CubeInteraction CreateCube()
     {
         CubeInteraction cube = Instantiate(_cubePrefab);
         cube.gameObject.SetActive(false);
-        _pooledObjects.Enqueue(cube);
+        _cubes.Enqueue(cube);
         return cube;
     }
 
-    public CubeInteraction GetFromPool()
+    public CubeInteraction GetCube()
     {
-        if (_pooledObjects.Count == 0)
-            CreateNewPooledObject();
+        if (_cubes.Count == 0)
+            CreateCube();
 
-        CubeInteraction cube = _pooledObjects.Dequeue();
+        CubeInteraction cube = _cubes.Dequeue();
         cube.gameObject.SetActive(true);
         return cube;
     }
 
-    public void ReturnToPool(CubeInteraction cube)
+    public void ReturnCube(CubeInteraction cube)
     {
         cube.gameObject.SetActive(false);
-        _pooledObjects.Enqueue(cube);
+        cube.transform.rotation = Quaternion.identity;
+        _cubes.Enqueue(cube);
     }
 }

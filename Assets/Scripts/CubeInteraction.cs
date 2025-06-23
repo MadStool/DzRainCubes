@@ -9,39 +9,37 @@ public class CubeInteraction : MonoBehaviour
     [SerializeField] private float _maxLifetime = 5f;
     [SerializeField] private Color _collisionColor = Color.red;
 
-    private Renderer _cubeRenderer;
-    private bool _hasCollided = false;
-    private Coroutine _returnCoroutine;
+    private Renderer _renderer;
+    private Rigidbody _rigidbody;
+    private bool _hasCollided;
+    private Coroutine _lifetimeCoroutine;
 
-    public event System.Action<CubeInteraction> OnReturnToPoolRequested;
+    public event System.Action<CubeInteraction> ReturnRequested;
 
     public Color Color
     {
-        get => _cubeRenderer.material.color;
-        set => _cubeRenderer.material.color = value;
+        get => _renderer.material.color;
+        set => _renderer.material.color = value;
     }
 
     private void Awake()
     {
-        _cubeRenderer = GetComponent<Renderer>();
+        _renderer = GetComponent<Renderer>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     public void Initialize(Color color, Vector3 position)
     {
         Color = color;
         transform.position = position;
+        transform.rotation = Quaternion.identity;
         ResetPhysics();
     }
 
     private void OnEnable()
     {
         _hasCollided = false;
-
-        if (_returnCoroutine != null)
-        {
-            StopCoroutine(_returnCoroutine);
-            _returnCoroutine = null;
-        }
+        ResetCoroutine();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -49,30 +47,37 @@ public class CubeInteraction : MonoBehaviour
         if (_hasCollided)
             return;
 
-        bool hasPlatform = collision.collider.TryGetComponent<Platform>(out Platform platform);
-
-        if (hasPlatform == false)
+        if (collision.collider.TryGetComponent<Platform>(out Platform platform) == false)
             return;
 
         _hasCollided = true;
         Color = _collisionColor;
-        _returnCoroutine = StartCoroutine(RequestReturnToPoolAfterDelay(GetRandomLifetime()));
+        _lifetimeCoroutine = StartCoroutine(ReturnAfterDelay(GetRandomLifetime()));
     }
 
     private float GetRandomLifetime() => Random.Range(_minLifetime, _maxLifetime);
 
-    private IEnumerator RequestReturnToPoolAfterDelay(float delay)
+    private IEnumerator ReturnAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        OnReturnToPoolRequested?.Invoke(this);
+        ReturnRequested?.Invoke(this);
     }
 
     private void ResetPhysics()
     {
-        if (TryGetComponent<Rigidbody>(out var rigidbody))
+        if (_rigidbody != null)
         {
-            rigidbody.linearVelocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
+            _rigidbody.linearVelocity = Vector3.zero;
+            _rigidbody.angularVelocity = Vector3.zero;
+        }
+    }
+
+    private void ResetCoroutine()
+    {
+        if (_lifetimeCoroutine != null)
+        {
+            StopCoroutine(_lifetimeCoroutine);
+            _lifetimeCoroutine = null;
         }
     }
 }

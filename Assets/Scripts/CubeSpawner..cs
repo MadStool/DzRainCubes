@@ -5,79 +5,79 @@ using System.Collections;
 public class CubeSpawner : MonoBehaviour
 {
     [SerializeField] private float _spawnRate = 1f;
-    [SerializeField] private Vector3 _spawnAreaSize = new Vector3(10f, 0f, 10f);
+    [SerializeField] private Vector3 _spawnArea = new Vector3(10f, 0f, 10f);
     [SerializeField] private float _spawnHeight = 10f;
-    [SerializeField] private Color _initialCubeColor = Color.white;
-    [SerializeField] private ObjectPool _cubePool;
+    [SerializeField] private Color _defaultColor = Color.white;
+    [SerializeField] private ObjectPool _pool;
 
-    private Coroutine _spawningCoroutine;
-    private bool _isSpawningActive;
+    private Coroutine _spawnRoutine;
+    private bool _isActive;
 
     private void Start()
     {
-        ValidateDependencies();
-        StartSpawning();
+        ValidateReferences();
+        BeginSpawning();
     }
 
     private void OnValidate()
     {
-        ValidateDependencies();
+        ValidateReferences();
     }
 
-    private void ValidateDependencies()
+    private void ValidateReferences()
     {
-        if (_cubePool == null)
-            _cubePool = GetComponentInChildren<ObjectPool>(true);
+        if (_pool == null)
+            _pool = GetComponentInChildren<ObjectPool>(true);
     }
 
-    public void StartSpawning()
+    public void BeginSpawning()
     {
-        if (_spawningCoroutine != null)
-            StopCoroutine(_spawningCoroutine);
+        if (_spawnRoutine != null)
+            StopCoroutine(_spawnRoutine);
 
-        _isSpawningActive = true;
-        _spawningCoroutine = StartCoroutine(SpawnCubesRoutine());
+        _isActive = true;
+        _spawnRoutine = StartCoroutine(SpawnRoutine());
     }
 
     public void StopSpawning()
     {
-        _isSpawningActive = false;
+        _isActive = false;
 
-        if (_spawningCoroutine != null)
+        if (_spawnRoutine != null)
         {
-            StopCoroutine(_spawningCoroutine);
-            _spawningCoroutine = null;
+            StopCoroutine(_spawnRoutine);
+            _spawnRoutine = null;
         }
     }
 
-    private IEnumerator SpawnCubesRoutine()
+    private IEnumerator SpawnRoutine()
     {
-        while (_isSpawningActive)
+        while (_isActive)
         {
-            if (_cubePool != null)
-                SpawnCube();
+            if (_pool != null)
+                Spawn();
 
             yield return new WaitForSeconds(1f / _spawnRate);
         }
     }
 
-    private void SpawnCube()
+    private void Spawn()
     {
-        CubeInteraction cube = _cubePool.GetFromPool();
-        cube.Initialize(_initialCubeColor, GetRandomPosition());
-        cube.OnReturnToPoolRequested += ReturnCubeToPool;
+        CubeInteraction cube = _pool.GetCube();
+        cube.Initialize(_defaultColor, GetRandomPosition());
+        cube.ReturnRequested += HandleCubeReturn;
     }
 
-    private void ReturnCubeToPool(CubeInteraction cube)
+    private void HandleCubeReturn(CubeInteraction cube)
     {
-        cube.OnReturnToPoolRequested -= ReturnCubeToPool;
-        _cubePool.ReturnToPool(cube);
+        cube.ReturnRequested -= HandleCubeReturn;
+        _pool.ReturnCube(cube);
     }
 
     private Vector3 GetRandomPosition() => new Vector3(
-        Random.Range(-_spawnAreaSize.x / 2, _spawnAreaSize.x / 2),
+        Random.Range(-_spawnArea.x / 2, _spawnArea.x / 2),
         _spawnHeight,
-        Random.Range(-_spawnAreaSize.z / 2, _spawnAreaSize.z / 2)
+        Random.Range(-_spawnArea.z / 2, _spawnArea.z / 2)
     );
 
     private void OnDrawGizmos()
@@ -85,7 +85,7 @@ public class CubeSpawner : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireCube(
             new Vector3(0, _spawnHeight, 0),
-            new Vector3(_spawnAreaSize.x, 0.1f, _spawnAreaSize.z)
+            new Vector3(_spawnArea.x, 0.1f, _spawnArea.z)
         );
     }
 
