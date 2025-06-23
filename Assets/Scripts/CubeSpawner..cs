@@ -1,5 +1,6 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
+using System.Collections;
 
 public class CubeSpawner : MonoBehaviour
 {
@@ -7,31 +8,70 @@ public class CubeSpawner : MonoBehaviour
     [SerializeField] private Vector3 _spawnAreaSize = new Vector3(10f, 0f, 10f);
     [SerializeField] private float _spawnHeight = 10f;
     [SerializeField] private Color _initialCubeColor = Color.white;
+    [SerializeField] private ObjectPool _cubePool;
 
-    private ObjectPool _cubePool;
-    private float _nextSpawnTime;
+    private Coroutine _spawningCoroutine;
+    private bool _isSpawningActive;
 
-    public void Initialize(ObjectPool pool) => _cubePool = pool;
-
-    private void Update()
+    private void Start()
     {
-        if (_cubePool == null || Time.time < _nextSpawnTime)
-            return;
+        ValidateDependencies();
+        StartSpawning();
+    }
 
-        SpawnCube();
-        _nextSpawnTime = Time.time + 1f / _spawnRate;
+    private void OnValidate()
+    {
+        ValidateDependencies();
+    }
+
+    private void ValidateDependencies()
+    {
+        if (_cubePool == null)
+            _cubePool = GetComponentInChildren<ObjectPool>(true);
+    }
+
+    public void StartSpawning()
+    {
+        if (_spawningCoroutine != null)
+            StopCoroutine(_spawningCoroutine);
+
+        _isSpawningActive = true;
+        _spawningCoroutine = StartCoroutine(SpawnCubesRoutine());
+    }
+
+    public void StopSpawning()
+    {
+        _isSpawningActive = false;
+
+        if (_spawningCoroutine != null)
+        {
+            StopCoroutine(_spawningCoroutine);
+            _spawningCoroutine = null;
+        }
+    }
+
+    private IEnumerator SpawnCubesRoutine()
+    {
+        while (_isSpawningActive)
+        {
+            if (_cubePool != null)
+                SpawnCube();
+
+            yield return new WaitForSeconds(1f / _spawnRate);
+        }
     }
 
     private void SpawnCube()
     {
-        GameObject cube = _cubePool.GetFromPool();
-        CubeInteraction interaction = cube.GetComponent<CubeInteraction>();
+        CubeInteraction cube = _cubePool.GetFromPool();
+        cube.Initialize(_initialCubeColor, GetRandomPosition());
+        cube.OnReturnToPoolRequested += ReturnCubeToPool;
+    }
 
-        interaction.Initialize(_cubePool);
-
-        cube.transform.position = GetRandomPosition();
-        cube.GetComponent<Renderer>().material.color = _initialCubeColor;
-        ResetPhysics(cube);
+    private void ReturnCubeToPool(CubeInteraction cube)
+    {
+        cube.OnReturnToPoolRequested -= ReturnCubeToPool;
+        _cubePool.ReturnToPool(cube);
     }
 
     private Vector3 GetRandomPosition() => new Vector3(
@@ -40,17 +80,6 @@ public class CubeSpawner : MonoBehaviour
         Random.Range(-_spawnAreaSize.z / 2, _spawnAreaSize.z / 2)
     );
 
-    private void ResetPhysics(GameObject cube)
-    {
-        Rigidbody rigidbody = cube.GetComponent<Rigidbody>();
-
-        if (rigidbody == null) 
-            return;
-
-        rigidbody.linearVelocity = Vector3.zero;
-        rigidbody.angularVelocity = Vector3.zero;
-    }
-
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
@@ -58,5 +87,10 @@ public class CubeSpawner : MonoBehaviour
             new Vector3(0, _spawnHeight, 0),
             new Vector3(_spawnAreaSize.x, 0.1f, _spawnAreaSize.z)
         );
+    }
+
+    private void OnDestroy()
+    {
+        StopSpawning();
     }
 }

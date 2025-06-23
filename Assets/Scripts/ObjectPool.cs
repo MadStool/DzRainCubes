@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 public class ObjectPool : MonoBehaviour
 {
-    [SerializeField] private GameObject _cubePrefab;
+    [SerializeField] private CubeInteraction _cubePrefab;
     [SerializeField] private int _initialPoolSize = 20;
 
-    private Queue<GameObject> _pooledObjects = new Queue<GameObject>();
+    private Queue<CubeInteraction> _pooledObjects = new Queue<CubeInteraction>();
 
     private void Start()
     {
@@ -21,29 +21,27 @@ public class ObjectPool : MonoBehaviour
         }
     }
 
-    private GameObject CreateNewPooledObject()
+    private CubeInteraction CreateNewPooledObject()
     {
-        GameObject cube = Instantiate(_cubePrefab);
-        cube.SetActive(false);
+        CubeInteraction cube = Instantiate(_cubePrefab);
+        cube.gameObject.SetActive(false);
         _pooledObjects.Enqueue(cube);
         return cube;
     }
 
-    public GameObject GetFromPool()
+    public CubeInteraction GetFromPool()
     {
         if (_pooledObjects.Count == 0)
-        {
             CreateNewPooledObject();
-        }
 
-        GameObject cube = _pooledObjects.Dequeue();
-        cube.SetActive(true);
+        CubeInteraction cube = _pooledObjects.Dequeue();
+        cube.gameObject.SetActive(true);
         return cube;
     }
 
-    public void ReturnToPool(GameObject cube)
+    public void ReturnToPool(CubeInteraction cube)
     {
-        cube.SetActive(false);
+        cube.gameObject.SetActive(false);
         _pooledObjects.Enqueue(cube);
     }
 }
