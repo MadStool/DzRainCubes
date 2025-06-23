@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
-  productGUID: beb3bbac62f622b4fb5e4eda5588e162
+  productGUID: c09809beb263edf48a817fd0781a3fbf
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: DzVzriviCubes0.2new
+  productName: DzRainCubes
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -837,14 +837,14 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: DzVzriviCubes0.2new
+  metroPackageName: DzRainCubes
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: DzVzriviCubes0.2new
+  metroApplicationDescription: DzRainCubes
   wsaImages: {}
   metroTileShortName: 
   metroTileShowName: 0
@@ -915,10 +915,10 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: cb678503-91a9-40ef-ae58-134efda2a40d
+  cloudProjectId: e94c15d6-b1e1-49b4-8353-d23142daae05
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: DzVzriviCubes0.2new
+  projectName: DzRainCubes
   organizationId: teranozavraks
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
