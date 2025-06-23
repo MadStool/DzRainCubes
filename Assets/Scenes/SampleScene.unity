@@ -531,10 +531,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawnRate: 1
-  _spawnAreaSize: {x: 14, y: 1.44, z: 14}
+  _spawnArea: {x: 10, y: 0, z: 10}
   _spawnHeight: 10
-  _initialCubeColor: {r: 1, g: 1, b: 1, a: 1}
-  _cubePool: {fileID: 689171578}
+  _defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  _pool: {fileID: 689171578}
 --- !u!114 &689171578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -547,7 +547,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 352af7224cebd8941836d769aa9084c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cubePrefab: {fileID: 6416063526580914378, guid: ea53343233c370246a173be07d4a4bfb, type: 3}
+  _cubePrefab: {fileID: 1332547883453730481, guid: ea53343233c370246a173be07d4a4bfb, type: 3}
   _initialPoolSize: 20
 --- !u!4 &689171579
 Transform:

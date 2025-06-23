@@ -1,83 +1,56 @@
 using UnityEngine;
-using System.Collections;
 
-[RequireComponent(typeof(Renderer))]
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CubePhysics))]
+[RequireComponent(typeof(CubeVisuals))]
+[RequireComponent(typeof(CubeLifetime))]
 public class CubeInteraction : MonoBehaviour
 {
-    [SerializeField] private float _minLifetime = 2f;
-    [SerializeField] private float _maxLifetime = 5f;
     [SerializeField] private Color _collisionColor = Color.red;
 
-    private Renderer _renderer;
-    private Rigidbody _rigidbody;
+    private CubePhysics _physics;
+    private CubeVisuals _visuals;
+    private CubeLifetime _lifetime;
     private bool _hasCollided;
-    private Coroutine _lifetimeCoroutine;
-
-    public event System.Action<CubeInteraction> ReturnRequested;
-
-    public Color Color
-    {
-        get => _renderer.material.color;
-        set => _renderer.material.color = value;
-    }
 
     private void Awake()
     {
-        _renderer = GetComponent<Renderer>();
-        _rigidbody = GetComponent<Rigidbody>();
+        _physics = GetComponent<CubePhysics>();
+        _visuals = GetComponent<CubeVisuals>();
+        _lifetime = GetComponent<CubeLifetime>();
+
+        _lifetime.LifetimeEnded += OnLifetimeEnded;
+    }
+
+    private void OnDestroy()
+    {
+        _lifetime.LifetimeEnded -= OnLifetimeEnded;
     }
 
     public void Initialize(Color color, Vector3 position)
     {
-        Color = color;
-        transform.position = position;
-        transform.rotation = Quaternion.identity;
-        ResetPhysics();
+        _visuals.Color = color;
+        transform.SetPositionAndRotation(position, Quaternion.identity);
+        _physics.ResetPhysics();
+        _hasCollided = false;
     }
 
     private void OnEnable()
     {
         _hasCollided = false;
-        ResetCoroutine();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (_hasCollided)
-            return;
-
-        if (collision.collider.TryGetComponent<Platform>(out Platform platform) == false)
+        if (_hasCollided || collision.collider.TryGetComponent<Platform>(out Platform platform) == false)
             return;
 
         _hasCollided = true;
-        Color = _collisionColor;
-        _lifetimeCoroutine = StartCoroutine(ReturnAfterDelay(GetRandomLifetime()));
+        _visuals.Color = _collisionColor;
+        _lifetime.StartLifetimeCountdown();
     }
 
-    private float GetRandomLifetime() => Random.Range(_minLifetime, _maxLifetime);
-
-    private IEnumerator ReturnAfterDelay(float delay)
+    private void OnLifetimeEnded(CubeLifetime cubeLifetime)
     {
-        yield return new WaitForSeconds(delay);
-        ReturnRequested?.Invoke(this);
-    }
-
-    private void ResetPhysics()
-    {
-        if (_rigidbody != null)
-        {
-            _rigidbody.linearVelocity = Vector3.zero;
-            _rigidbody.angularVelocity = Vector3.zero;
-        }
-    }
-
-    private void ResetCoroutine()
-    {
-        if (_lifetimeCoroutine != null)
-        {
-            StopCoroutine(_lifetimeCoroutine);
-            _lifetimeCoroutine = null;
-        }
+        gameObject.SetActive(false);
     }
 }

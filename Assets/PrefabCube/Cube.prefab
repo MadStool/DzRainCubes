@@ -13,7 +13,10 @@ GameObject:
   - component: {fileID: 1890269301525167165}
   - component: {fileID: 8790303167777997600}
   - component: {fileID: 3545560937934406828}
-  - component: {fileID: 6416063526580914378}
+  - component: {fileID: 4342194396715042552}
+  - component: {fileID: -4635356396747040453}
+  - component: {fileID: 2613589884518561439}
+  - component: {fileID: 1332547883453730481}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -137,7 +140,45 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6416063526580914378
+--- !u!114 &4342194396715042552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8723424785758628858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4b486430683db43ab04f5c7e83c396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-4635356396747040453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8723424785758628858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d8caa76655203b43937ea4ab9105e16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2613589884518561439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8723424785758628858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74def87b51f4d9f4c96a1ae76a8944a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _minLifetime: 2
+  _maxLifetime: 5
+--- !u!114 &1332547883453730481
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,6 +190,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b789c94e501ddc54b996e033419249d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minLifetime: 2
-  _maxLifetime: 5
   _collisionColor: {r: 1, g: 0, b: 0, a: 1}

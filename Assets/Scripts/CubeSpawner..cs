@@ -4,9 +4,19 @@ using System.Collections;
 
 public class CubeSpawner : MonoBehaviour
 {
-    [SerializeField] private float _spawnRate = 1f;
+    private const float MIN_SPAWN_RATE = 0.1f;
+    private const float MAX_SPAWN_RATE = 10f;
+    private const float MIN_SPAWN_HEIGHT = 5f;
+    private const float MAX_SPAWN_HEIGHT = 20f;
+
+    [SerializeField, Range(MIN_SPAWN_RATE, MAX_SPAWN_RATE)]
+    private float _spawnRate = 1f;
+
     [SerializeField] private Vector3 _spawnArea = new Vector3(10f, 0f, 10f);
-    [SerializeField] private float _spawnHeight = 10f;
+
+    [SerializeField, Range(MIN_SPAWN_HEIGHT, MAX_SPAWN_HEIGHT)]
+    private float _spawnHeight = 10f;
+
     [SerializeField] private Color _defaultColor = Color.white;
     [SerializeField] private ObjectPool _pool;
 
@@ -32,8 +42,8 @@ public class CubeSpawner : MonoBehaviour
 
     public void BeginSpawning()
     {
-        if (_spawnRoutine != null)
-            StopCoroutine(_spawnRoutine);
+        if (_isActive)
+            return;
 
         _isActive = true;
         _spawnRoutine = StartCoroutine(SpawnRoutine());
@@ -41,6 +51,9 @@ public class CubeSpawner : MonoBehaviour
 
     public void StopSpawning()
     {
+        if (!_isActive)
+            return;
+
         _isActive = false;
 
         if (_spawnRoutine != null)
@@ -52,33 +65,32 @@ public class CubeSpawner : MonoBehaviour
 
     private IEnumerator SpawnRoutine()
     {
+        var waitTime = new WaitForSeconds(1f / _spawnRate);
+
         while (_isActive)
         {
-            if (_pool != null)
-                Spawn();
-
-            yield return new WaitForSeconds(1f / _spawnRate);
+            Spawn();
+            yield return waitTime;
         }
     }
 
     private void Spawn()
     {
-        CubeInteraction cube = _pool.GetCube();
+        if (_pool == null)
+            return;
+
+        var cube = _pool.GetCube();
         cube.Initialize(_defaultColor, GetRandomPosition());
-        cube.ReturnRequested += HandleCubeReturn;
     }
 
-    private void HandleCubeReturn(CubeInteraction cube)
+    private Vector3 GetRandomPosition()
     {
-        cube.ReturnRequested -= HandleCubeReturn;
-        _pool.ReturnCube(cube);
+        return new Vector3(
+            Random.Range(-_spawnArea.x / 2f, _spawnArea.x / 2f),
+            _spawnHeight,
+            Random.Range(-_spawnArea.z / 2f, _spawnArea.z / 2f)
+        );
     }
-
-    private Vector3 GetRandomPosition() => new Vector3(
-        Random.Range(-_spawnArea.x / 2, _spawnArea.x / 2),
-        _spawnHeight,
-        Random.Range(-_spawnArea.z / 2, _spawnArea.z / 2)
-    );
 
     private void OnDrawGizmos()
     {

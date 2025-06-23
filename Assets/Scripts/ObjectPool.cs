@@ -26,6 +26,7 @@ public class ObjectPool : MonoBehaviour
         CubeInteraction cube = Instantiate(_cubePrefab);
         cube.gameObject.SetActive(false);
         _cubes.Enqueue(cube);
+
         return cube;
     }
 
